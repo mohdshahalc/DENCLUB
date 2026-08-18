@@ -81,15 +81,15 @@ export function Navbar({ cartCount, wishlistCount, onOpenCart, onSelectShoe, sho
           </nav>
 
           {/* Right Action Controls */}
-          <div className="flex items-center gap-2.5 sm:gap-4">
+          <div className="flex items-center gap-1.5 sm:gap-3.5">
             
             {/* Search Button */}
             <button 
               onClick={() => setSearchOpen(true)}
-              className="p-2 rounded-full text-zinc-700 hover:text-black hover:bg-zinc-100 transition"
+              className="p-1.5 sm:p-2 rounded-full text-zinc-700 hover:text-black hover:bg-zinc-100 transition"
               aria-label="Search shoes"
             >
-              <Search className="size-5" />
+              <Search className="size-4 sm:size-5" />
             </button>
 
             {/* Wishlist */}
@@ -109,7 +109,7 @@ export function Navbar({ cartCount, wishlistCount, onOpenCart, onSelectShoe, sho
             {/* Shopping Bag Button */}
             <button 
               onClick={onOpenCart}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-zinc-100 hover:bg-zinc-200 text-black font-semibold text-xs sm:text-sm transition group"
+              className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-zinc-100 hover:bg-zinc-200 text-black font-semibold text-xs sm:text-sm transition group"
               aria-label="Shopping Bag"
             >
               <div className="relative">
@@ -121,13 +121,13 @@ export function Navbar({ cartCount, wishlistCount, onOpenCart, onSelectShoe, sho
                 )}
               </div>
               <span className="hidden sm:inline">Bag</span>
-              <span className="text-xs text-zinc-500 font-bold">({cartCount})</span>
+              <span className="text-[11px] sm:text-xs text-zinc-500 font-bold">({cartCount})</span>
             </button>
 
             {/* JOIN Button (matches exact screenshot style) */}
             <button 
               onClick={() => setJoinModalOpen(true)}
-              className="px-5 py-2 rounded-full bg-[#ccff00] hover:bg-[#b8e600] active:scale-95 text-black font-extrabold text-xs uppercase tracking-wider transition shadow-sm cursor-pointer"
+              className="px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-[#ccff00] hover:bg-[#b8e600] active:scale-95 text-black font-extrabold text-[11px] sm:text-xs uppercase tracking-wider transition shadow-xs cursor-pointer"
             >
               JOIN
             </button>

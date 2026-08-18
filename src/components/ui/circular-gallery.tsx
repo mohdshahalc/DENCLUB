@@ -40,6 +40,17 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
     const count = items.length;
     const anglePerItem = count > 0 ? 360 / count : 60;
 
+    // Responsive mobile detection
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+      const checkMobile = () => setIsMobile(window.innerWidth < 640);
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+      return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    const effectiveRadius = isMobile ? Math.min(radius * 0.52, 190) : radius;
+
     // Continuous rotation physics matching CurvedSneakerRack
     const [rotation, setRotation] = useState(0);
     const posRef = useRef(0);
@@ -219,6 +230,7 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
 
     // Parallax mouse tilt
     const handleContainerMouseMove = (e: React.MouseEvent) => {
+      if (isMobile) return;
       const rect = e.currentTarget.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
@@ -245,10 +257,10 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
         onMouseMove={handleContainerMouseMove}
         onMouseLeave={handleContainerMouseLeave}
         className={cn(
-          "relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing select-none overflow-visible",
+          "relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing select-none overflow-hidden sm:overflow-visible touch-pan-y",
           className
         )}
-        style={{ perspective: '1600px' }}
+        style={{ perspective: isMobile ? '1000px' : '1600px' }}
         {...props}
       >
         {/* Left & Right Step Buttons */}
@@ -257,16 +269,16 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
             <button
               onClick={stepPrev}
               aria-label="Previous Slide"
-              className="absolute left-4 sm:left-8 z-30 size-11 rounded-full bg-white/95 backdrop-blur-md border border-zinc-200 shadow-xl flex items-center justify-center text-zinc-900 hover:bg-[#ccff00] hover:scale-110 active:scale-95 transition cursor-pointer"
+              className="absolute left-2 sm:left-6 z-30 size-9 sm:size-11 rounded-full bg-white/95 backdrop-blur-md border border-zinc-200 shadow-lg flex items-center justify-center text-zinc-900 hover:bg-[#ccff00] hover:scale-110 active:scale-95 transition cursor-pointer"
             >
-              <ChevronLeft className="size-5" />
+              <ChevronLeft className="size-4 sm:size-5" />
             </button>
             <button
               onClick={stepNext}
               aria-label="Next Slide"
-              className="absolute right-4 sm:right-8 z-30 size-11 rounded-full bg-white/95 backdrop-blur-md border border-zinc-200 shadow-xl flex items-center justify-center text-zinc-900 hover:bg-[#ccff00] hover:scale-110 active:scale-95 transition cursor-pointer"
+              className="absolute right-2 sm:right-6 z-30 size-9 sm:size-11 rounded-full bg-white/95 backdrop-blur-md border border-zinc-200 shadow-lg flex items-center justify-center text-zinc-900 hover:bg-[#ccff00] hover:scale-110 active:scale-95 transition cursor-pointer"
             >
-              <ChevronRight className="size-5" />
+              <ChevronRight className="size-4 sm:size-5" />
             </button>
           </>
         )}
@@ -286,7 +298,7 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
             const normalizedAngle = Math.abs(relativeAngle > 180 ? 360 - relativeAngle : relativeAngle);
             
             // True 3D Depth Opacity & Lighting for the full 360 ring
-            const opacity = Math.max(0.45, 1 - (normalizedAngle / 240));
+            const opacity = Math.max(0.4, 1 - (normalizedAngle / 220));
 
             return (
               <div
@@ -303,15 +315,15 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
                   if (onItemClick) onItemClick(item, i);
                 }}
                 className={cn(
-                  "absolute w-[195px] sm:w-[225px] h-[270px] sm:h-[305px] transition-all duration-300 cursor-pointer",
+                  "absolute w-[150px] sm:w-[195px] md:w-[220px] h-[215px] sm:h-[270px] md:h-[300px] transition-all duration-300 cursor-pointer",
                   cardClassName
                 )}
                 style={{
-                  transform: `rotateY(${itemAngle}deg) translateZ(${radius}px)`,
+                  transform: `rotateY(${itemAngle}deg) translateZ(${effectiveRadius}px)`,
                   left: '50%',
                   top: '50%',
-                  marginLeft: '-98px',
-                  marginTop: '-135px',
+                  marginLeft: isMobile ? '-75px' : '-100px',
+                  marginTop: isMobile ? '-107px' : '-140px',
                   opacity: opacity,
                   transformStyle: 'preserve-3d',
                   zIndex: Math.round(100 - normalizedAngle),
@@ -321,7 +333,7 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
                 {/* FRONT FACE: Editorial Card with Details */}
                 {/* ========================================================================= */}
                 <div 
-                  className="group absolute inset-0 w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border border-zinc-200 bg-zinc-900 cursor-pointer transition-transform duration-300 hover:scale-105 flex flex-col justify-end p-4 sm:p-5"
+                  className="group absolute inset-0 w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-zinc-200 bg-zinc-900 cursor-pointer transition-transform duration-300 hover:scale-105 flex flex-col justify-end p-3 sm:p-5"
                   style={{
                     backfaceVisibility: 'hidden',
                     WebkitBackfaceVisibility: 'hidden',
@@ -340,33 +352,33 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
 
                   {/* Top Location Pill Badge */}
                   {item.location && (
-                    <div className="absolute top-3 left-3 z-10">
-                      <span className="px-2.5 py-0.5 rounded-full bg-white/90 backdrop-blur-md text-[9px] font-extrabold text-black border border-zinc-200 flex items-center gap-1 shadow-xs">
-                        <MapPin className="size-2.5 text-[#65a30d]" />
-                        {item.location}
+                    <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 z-10">
+                      <span className="px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-md text-[8px] sm:text-[9px] font-extrabold text-black border border-zinc-200 flex items-center gap-1 shadow-xs">
+                        <MapPin className="size-2 sm:size-2.5 text-[#65a30d]" />
+                        <span className="truncate max-w-[90px] sm:max-w-none">{item.location}</span>
                       </span>
                     </div>
                   )}
 
                   {/* Bottom details */}
-                  <div className="relative z-10 space-y-1.5">
-                    <span className="text-[9px] uppercase font-bold tracking-wider text-[#ccff00] block truncate">
+                  <div className="relative z-10 space-y-1 sm:space-y-1.5">
+                    <span className="text-[8px] sm:text-[9px] uppercase font-bold tracking-wider text-[#ccff00] block truncate">
                       {item.photo.text} • {item.photo.by}
                     </span>
                     <h3 
-                      className="text-sm sm:text-base font-bold text-white group-hover:text-[#ccff00] transition uppercase leading-tight line-clamp-2"
+                      className="text-xs sm:text-base font-bold text-white group-hover:text-[#ccff00] transition uppercase leading-tight line-clamp-2"
                       style={{ fontFamily: 'Syne, sans-serif' }}
                     >
                       {item.common}
                     </h3>
                     
-                    <div className="pt-1.5 border-t border-white/20 flex items-center justify-between">
-                      <div className="min-w-0 pr-2">
-                        <span className="text-[9px] text-zinc-300 block">Featured</span>
-                        <span className="text-[11px] font-bold text-white block truncate">{item.binomial}</span>
+                    <div className="pt-1 border-t border-white/20 flex items-center justify-between">
+                      <div className="min-w-0 pr-1">
+                        <span className="text-[8px] sm:text-[9px] text-zinc-300 block">Featured</span>
+                        <span className="text-[10px] sm:text-[11px] font-bold text-white block truncate">{item.binomial}</span>
                       </div>
-                      <div className="size-7 shrink-0 rounded-full bg-[#ccff00] text-black flex items-center justify-center group-hover:scale-110 transition shadow-xs">
-                        <ArrowUpRight className="size-3.5" />
+                      <div className="size-6 sm:size-7 shrink-0 rounded-full bg-[#ccff00] text-black flex items-center justify-center group-hover:scale-110 transition shadow-xs">
+                        <ArrowUpRight className="size-3 sm:size-3.5" />
                       </div>
                     </div>
                   </div>
@@ -376,7 +388,7 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
                 {/* BACK FACE (When viewed in 3D Background Circle): Sleek Photo & Vault Seal */}
                 {/* ========================================================================= */}
                 <div
-                  className="absolute inset-0 w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-zinc-300/40 bg-zinc-950 flex flex-col items-center justify-center p-4"
+                  className="absolute inset-0 w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-zinc-300/40 bg-zinc-950 flex flex-col items-center justify-center p-3 sm:p-4"
                   style={{
                     transform: 'rotateY(180deg)',
                     backfaceVisibility: 'hidden',
@@ -392,10 +404,10 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
                   <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90" />
                   
                   <div className="relative z-10 text-center space-y-1">
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#ccff00] block font-bold">
+                    <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-[#ccff00] block font-bold">
                       DENCLUB VAULT
                     </span>
-                    <span className="text-[10px] font-bold text-zinc-200 block uppercase">
+                    <span className="text-[8px] sm:text-[10px] font-bold text-zinc-200 block uppercase truncate max-w-[120px]">
                       {item.location || item.photo.text}
                     </span>
                   </div>
