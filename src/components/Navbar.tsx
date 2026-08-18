@@ -81,18 +81,18 @@ export function Navbar({ cartCount, wishlistCount, onOpenCart, onSelectShoe, sho
           </nav>
 
           {/* Right Action Controls */}
-          <div className="flex items-center gap-1.5 sm:gap-3.5">
+          <div className="flex items-center gap-2 sm:gap-3.5">
             
-            {/* Search Button */}
+            {/* Search Button (Hidden on Mobile) */}
             <button 
               onClick={() => setSearchOpen(true)}
-              className="p-1.5 sm:p-2 rounded-full text-zinc-700 hover:text-black hover:bg-zinc-100 transition"
+              className="hidden sm:flex p-2 rounded-full text-zinc-700 hover:text-black hover:bg-zinc-100 transition cursor-pointer"
               aria-label="Search shoes"
             >
-              <Search className="size-4 sm:size-5" />
+              <Search className="size-5" />
             </button>
 
-            {/* Wishlist */}
+            {/* Wishlist (Hidden on Mobile) */}
             <a 
               href="#catalog"
               className="p-2 rounded-full text-zinc-700 hover:text-black hover:bg-zinc-100 transition relative hidden sm:flex"
@@ -106,10 +106,10 @@ export function Navbar({ cartCount, wishlistCount, onOpenCart, onSelectShoe, sho
               )}
             </a>
 
-            {/* Shopping Bag Button */}
+            {/* Shopping Bag Button (Hidden on Mobile) */}
             <button 
               onClick={onOpenCart}
-              className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-zinc-100 hover:bg-zinc-200 text-black font-semibold text-xs sm:text-sm transition group"
+              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-100 hover:bg-zinc-200 text-black font-semibold text-xs sm:text-sm transition group cursor-pointer"
               aria-label="Shopping Bag"
             >
               <div className="relative">
@@ -120,14 +120,14 @@ export function Navbar({ cartCount, wishlistCount, onOpenCart, onSelectShoe, sho
                   </span>
                 )}
               </div>
-              <span className="hidden sm:inline">Bag</span>
-              <span className="text-[11px] sm:text-xs text-zinc-500 font-bold">({cartCount})</span>
+              <span>Bag</span>
+              <span className="text-xs text-zinc-500 font-bold">({cartCount})</span>
             </button>
 
-            {/* JOIN Button (matches exact screenshot style) */}
+            {/* JOIN Button */}
             <button 
               onClick={() => setJoinModalOpen(true)}
-              className="px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-[#ccff00] hover:bg-[#b8e600] active:scale-95 text-black font-extrabold text-[11px] sm:text-xs uppercase tracking-wider transition shadow-xs cursor-pointer"
+              className="px-4 sm:px-5 py-1.5 sm:py-2 rounded-full bg-[#ccff00] hover:bg-[#b8e600] active:scale-95 text-black font-extrabold text-xs uppercase tracking-wider transition shadow-xs cursor-pointer"
             >
               JOIN
             </button>

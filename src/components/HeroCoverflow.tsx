@@ -235,7 +235,7 @@ export function HeroCoverflow({ onQuickView, onAddToCart }: HeroProps) {
           onMouseEnter={() => setHoveredShoe('right')}
           onMouseLeave={() => setHoveredShoe(null)}
           onMouseDown={(e) => handleMouseDown('right', e)}
-          className={`absolute top-4 sm:top-8 md:top-10 right-[-1%] sm:right-[1%] md:right-[3%] lg:right-[5%] xl:right-[7%] z-10 pointer-events-auto will-change-transform cursor-grab active:cursor-grabbing select-none transition-opacity duration-1000 ease-out ${
+          className={`absolute top-4 sm:top-8 md:top-10 right-0 sm:right-[1%] md:right-[3%] lg:right-[5%] xl:right-[7%] z-10 pointer-events-auto will-change-transform cursor-grab active:cursor-grabbing select-none transition-opacity duration-1000 ease-out ${
             isLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           style={{ transformStyle: 'preserve-3d' }}
@@ -246,7 +246,7 @@ export function HeroCoverflow({ onQuickView, onAddToCart }: HeroProps) {
             <img
               src={voltSneakerImg}
               alt="Volt V2 Carbon High-Top"
-              className="-scale-x-100 w-44 sm:w-56 md:w-68 lg:w-[360px] xl:w-[420px] object-contain drop-shadow-[0_24px_38px_rgba(0,0,0,0.22)] select-none pointer-events-none"
+              className="-scale-x-100 w-36 xs:w-44 sm:w-56 md:w-68 lg:w-[360px] xl:w-[420px] object-contain drop-shadow-[0_24px_38px_rgba(0,0,0,0.22)] select-none pointer-events-none"
               draggable={false}
             />
 
@@ -261,10 +261,10 @@ export function HeroCoverflow({ onQuickView, onAddToCart }: HeroProps) {
               onClick={() => onQuickView(DENCLUB_SHOES[1])}
               className="absolute top-1/4 left-0 sm:left-2 z-10 transition-all duration-300 group-hover:scale-105 cursor-pointer"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="size-2 rounded-full bg-[#ccff00] border-2 border-black animate-ping absolute" />
                 <span className="size-2 rounded-full bg-[#ccff00] border-2 border-black relative" />
-                <div className="px-3 py-1 rounded-full bg-black/95 text-[#ccff00] text-[9px] sm:text-[10px] font-mono font-bold tracking-wider uppercase backdrop-blur-md shadow-xl border border-zinc-800 flex items-center gap-1.5 hover:border-[#ccff00] transition">
+                <div className="px-2.5 sm:px-3 py-1 rounded-full bg-black/95 text-[#ccff00] text-[8px] sm:text-[10px] font-mono font-bold tracking-wider uppercase backdrop-blur-md shadow-xl border border-zinc-800 flex items-center gap-1.5 hover:border-[#ccff00] transition whitespace-nowrap">
                   <RotateCw className="size-2.5 animate-spin text-zinc-400" style={{ animationDuration: '6s' }} />
                   <span>VOLT V2</span>
                   <span className="text-white">·</span>
@@ -294,7 +294,7 @@ export function HeroCoverflow({ onQuickView, onAddToCart }: HeroProps) {
           onMouseEnter={() => setHoveredShoe('left')}
           onMouseLeave={() => setHoveredShoe(null)}
           onMouseDown={(e) => handleMouseDown('left', e)}
-          className={`absolute bottom-16 sm:bottom-24 md:bottom-28 left-[-1%] sm:left-[1%] md:left-[3%] lg:left-[5%] xl:left-[7%] z-10 pointer-events-auto will-change-transform cursor-grab active:cursor-grabbing select-none transition-opacity duration-1000 ease-out ${
+          className={`absolute bottom-10 sm:bottom-24 md:bottom-28 left-0 sm:left-[1%] md:left-[3%] lg:left-[5%] xl:left-[7%] z-10 pointer-events-auto will-change-transform cursor-grab active:cursor-grabbing select-none transition-opacity duration-1000 ease-out ${
             isLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           style={{ transformStyle: 'preserve-3d' }}
@@ -305,7 +305,7 @@ export function HeroCoverflow({ onQuickView, onAddToCart }: HeroProps) {
             <img
               src={crimsonRunnerImg}
               alt="Apex X Streetwear Runner"
-              className="w-40 sm:w-52 md:w-64 lg:w-[340px] xl:w-[390px] object-contain drop-shadow-[0_24px_38px_rgba(0,0,0,0.2)] select-none pointer-events-none"
+              className="w-36 xs:w-40 sm:w-52 md:w-64 lg:w-[340px] xl:w-[390px] object-contain drop-shadow-[0_24px_38px_rgba(0,0,0,0.2)] select-none pointer-events-none"
               draggable={false}
             />
 
@@ -318,12 +318,12 @@ export function HeroCoverflow({ onQuickView, onAddToCart }: HeroProps) {
             {/* Interactive 3D Orbit Badge */}
             <div 
               onClick={() => onQuickView(DENCLUB_SHOES[0])}
-              className="absolute bottom-1/4 right-0 sm:right-2 z-10 transition-all duration-300 group-hover:scale-105 cursor-pointer"
+              className="absolute -bottom-2 sm:bottom-1/4 left-1 sm:right-2 z-10 transition-all duration-300 group-hover:scale-105 cursor-pointer"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="size-2 rounded-full bg-[#ef4444] border-2 border-black animate-ping absolute" />
                 <span className="size-2 rounded-full bg-[#ef4444] border-2 border-black relative" />
-                <div className="px-3 py-1 rounded-full bg-black/95 text-white text-[9px] sm:text-[10px] font-mono font-bold tracking-wider uppercase backdrop-blur-md shadow-xl border border-zinc-800 flex items-center gap-1.5 hover:border-red-500 transition">
+                <div className="px-2.5 sm:px-3 py-1 rounded-full bg-black/95 text-white text-[8px] sm:text-[10px] font-mono font-bold tracking-wider uppercase backdrop-blur-md shadow-xl border border-zinc-800 flex items-center gap-1.5 hover:border-red-500 transition whitespace-nowrap">
                   <RotateCw className="size-2.5 animate-spin text-zinc-400" style={{ animationDuration: '6s' }} />
                   <span>APEX X</span>
                   <span className="text-[#ccff00]">·</span>
@@ -377,7 +377,7 @@ export function HeroCoverflow({ onQuickView, onAddToCart }: HeroProps) {
           {/* Line 1: SNEAKERS BUILT */}
           <div ref={line1Ref} className="will-change-transform transition-transform duration-100">
             <h1 
-              className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.25rem] font-black tracking-tighter uppercase leading-[0.88] text-black drop-shadow-sm" 
+              className="text-[1.65rem] xs:text-[2rem] sm:text-5xl md:text-6xl lg:text-[5.5rem] xl:text-[6.25rem] font-black tracking-tighter uppercase leading-[0.92] text-black drop-shadow-sm" 
               style={{ fontFamily: 'Syne, sans-serif' }}
             >
               SNEAKERS BUILT
@@ -387,7 +387,7 @@ export function HeroCoverflow({ onQuickView, onAddToCart }: HeroProps) {
           {/* Line 2: FOR THE STREET */}
           <div ref={line2Ref} className="will-change-transform transition-transform duration-100">
             <h2 
-              className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.25rem] font-black tracking-tighter uppercase leading-[0.88] text-[#65a30d] drop-shadow-sm" 
+              className="text-[1.65rem] xs:text-[2rem] sm:text-5xl md:text-6xl lg:text-[5.5rem] xl:text-[6.25rem] font-black tracking-tighter uppercase leading-[0.92] text-[#65a30d] drop-shadow-sm" 
               style={{ fontFamily: 'Syne, sans-serif' }}
             >
               FOR THE STREET

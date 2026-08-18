@@ -63,7 +63,7 @@ export function ReviewsSection() {
               <span>Verified Club Feedback</span>
             </div>
             <h2 
-              className="text-4xl sm:text-5xl font-black tracking-tight text-black uppercase"
+              className="text-2xl xs:text-3xl sm:text-5xl font-black tracking-tight text-black uppercase leading-[1.06]"
               style={{ fontFamily: 'Syne, sans-serif' }}
             >
               COMMUNITY HYPE & REVIEWS

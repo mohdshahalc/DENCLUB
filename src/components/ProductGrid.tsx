@@ -56,7 +56,7 @@ export function ProductGrid({
               <span>ATELIER ARCHIVE RELEASE</span>
             </div>
             <h2 
-              className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-black uppercase leading-[1.04]"
+              className="text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-black uppercase leading-[1.06]"
               style={{ fontFamily: 'Syne, sans-serif' }}
             >
               LATEST DROPS & SILHOUETTES

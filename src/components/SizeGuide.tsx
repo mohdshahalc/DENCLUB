@@ -34,7 +34,7 @@ export function SizeGuide() {
             </div>
 
             <h2 
-              className="text-4xl sm:text-5xl font-black tracking-tight text-black uppercase leading-tight"
+              className="text-2xl xs:text-3xl sm:text-5xl font-black tracking-tight text-black uppercase leading-[1.08]"
               style={{ fontFamily: 'Syne, sans-serif' }}
             >
               FIND YOUR EXACT DENCLUB SIZE
