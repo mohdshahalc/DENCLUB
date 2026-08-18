@@ -45,8 +45,8 @@ export function Navbar({ cartCount, wishlistCount, onOpenCart, onSelectShoe, sho
 
   return (
     <>
-      {/* Main Header in Clean White Aesthetic */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-zinc-200/80 transition-all">
+      {/* Main Header in Fixed Position with Glassmorphism */}
+      <header className="fixed top-0 inset-x-0 z-50 bg-white/90 backdrop-blur-xl border-b border-zinc-200/80 shadow-xs transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           
           {/* Brand Logo */}

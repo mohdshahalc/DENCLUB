@@ -103,8 +103,8 @@ export default function App() {
         shoes={DENCLUB_SHOES}
       />
 
-      {/* Main Landing Sections */}
-      <main className="flex-1">
+      {/* Main Landing Sections (pt-20 for fixed navbar offset) */}
+      <main className="flex-1 pt-20">
         {/* 1. Cinematic Hero Section */}
         <HeroCoverflow
           onQuickView={(shoe) => setQuickViewShoe(shoe)}
