@@ -173,7 +173,7 @@ export const DENCLUB_SHOES: ShoeProduct[] = [
     releaseYear: '2024',
     weight: '340g',
     cushioning: 'Skate & Street Plush',
-  },
+  }
 ];
 
 export const COVERFLOW_SLIDES: CoverflowSlide[] = [

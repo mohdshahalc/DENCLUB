@@ -5,14 +5,14 @@ import voltSneakerImg from '../assets/volt_sneaker.png';
 import crimsonRunnerImg from '../assets/crimson_runner.png';
 import { 
   ArrowRight, 
-  Ruler, 
   Flame, 
-  ShieldCheck, 
-  Truck, 
-  RotateCcw, 
+  Sparkles,
   Zap,
-  ChevronDown,
-  MousePointer2
+  RotateCw,
+  Compass,
+  Layers,
+  Activity,
+  Maximize2
 } from 'lucide-react';
 
 interface HeroProps {
@@ -24,15 +24,28 @@ export function HeroCoverflow({ onQuickView, onAddToCart }: HeroProps) {
   const outerContainerRef = useRef<HTMLDivElement>(null);
   const stickyStageRef = useRef<HTMLDivElement>(null);
   
-  // Element Refs for Hardware-Accelerated Transforms
+  // Hardware-accelerated refs
   const leftShoeRef = useRef<HTMLDivElement>(null);
   const rightShoeRef = useRef<HTMLDivElement>(null);
+  const leftShadowRef = useRef<HTMLDivElement>(null);
+  const rightShadowRef = useRef<HTMLDivElement>(null);
   const line1Ref = useRef<HTMLDivElement>(null);
   const line2Ref = useRef<HTMLDivElement>(null);
-  const line3Ref = useRef<HTMLDivElement>(null);
-  const line4Ref = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
+
+  // Extraordinary Interactive States
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hoveredShoe, setHoveredShoe] = useState<'left' | 'right' | null>(null);
+  const [techMode, setTechMode] = useState(false);
+  
+  // Drag-to-spin state
+  const isDragging = useRef(false);
+  const dragTarget = useRef<'left' | 'right' | null>(null);
+  const startX = useRef(0);
+  const leftSpin = useRef(0);
+  const rightSpin = useRef(0);
+  const leftSpinVel = useRef(0);
+  const rightSpinVel = useRef(0);
 
   // Mouse & Scroll Lerp State
   const animState = useRef({
@@ -41,104 +54,139 @@ export function HeroCoverflow({ onQuickView, onAddToCart }: HeroProps) {
     targetMouseX: 0,
     targetMouseY: 0,
     scrollProgress: 0,
-    targetScrollProgress: 0
+    targetScrollProgress: 0,
+    time: 0
   });
 
-  const [isLoaded, setIsLoaded] = useState(false);
-
   useEffect(() => {
-    // Initial entrance reveal
     const timer = setTimeout(() => {
       setIsLoaded(true);
-    }, 100);
+    }, 50);
 
     const onMouseMove = (e: MouseEvent) => {
       const { innerWidth, innerHeight } = window;
       animState.current.targetMouseX = (e.clientX / innerWidth - 0.5) * 2; // -1 to 1
       animState.current.targetMouseY = (e.clientY / innerHeight - 0.5) * 2; // -1 to 1
+
+      if (isDragging.current) {
+        const deltaX = e.clientX - startX.current;
+        startX.current = e.clientX;
+        if (dragTarget.current === 'left') {
+          leftSpinVel.current = deltaX * 0.8;
+          leftSpin.current += deltaX * 0.8;
+        } else if (dragTarget.current === 'right') {
+          rightSpinVel.current = deltaX * 0.8;
+          rightSpin.current += deltaX * 0.8;
+        }
+      }
+    };
+
+    const onMouseUp = () => {
+      isDragging.current = false;
+      dragTarget.current = null;
     };
 
     const onScroll = () => {
-      if (!outerContainerRef.current) return;
-      const rect = outerContainerRef.current.getBoundingClientRect();
-      const totalScrollable = outerContainerRef.current.offsetHeight - window.innerHeight;
-      if (totalScrollable > 0) {
-        const rawProgress = -rect.top / totalScrollable;
-        animState.current.targetScrollProgress = Math.max(0, Math.min(1, rawProgress));
-      }
+      const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+      const viewportH = window.innerHeight || 800;
+      const progress = Math.max(0, Math.min(1.5, scrollY / (viewportH * 0.65)));
+      animState.current.targetScrollProgress = progress;
     };
 
     window.addEventListener('mousemove', onMouseMove, { passive: true });
+    window.addEventListener('mouseup', onMouseUp);
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll(); // initialize
+    onScroll();
 
-    // 120 FPS Lerp Loop for Buttery Smooth Scroll & Parallax
+    // 120 FPS High-Precision Physics Loop
     let rafId: number;
     const loop = () => {
-      // Lerp mouse
+      animState.current.time += 0.025;
+      const t = animState.current.time;
+
+      // Mouse & Scroll interpolation
       animState.current.mouseX += (animState.current.targetMouseX - animState.current.mouseX) * 0.08;
       animState.current.mouseY += (animState.current.targetMouseY - animState.current.mouseY) * 0.08;
-
-      // Lerp scroll progress for smooth inertia
       animState.current.scrollProgress += (animState.current.targetScrollProgress - animState.current.scrollProgress) * 0.1;
 
-      const p = animState.current.scrollProgress; // 0.00 to 1.00
+      const p = animState.current.scrollProgress; // 0.00 to 1.00+
       const mx = animState.current.mouseX;
       const my = animState.current.mouseY;
 
+      // Spin inertia decay
+      if (!isDragging.current) {
+        leftSpin.current += leftSpinVel.current;
+        leftSpinVel.current *= 0.92;
+        rightSpin.current += rightSpinVel.current;
+        rightSpinVel.current *= 0.92;
+      }
+
+      // Organic Levitation Oscillation
+      const floatLeftY = Math.sin(t) * 14;
+      const floatLeftRot = Math.cos(t * 0.8) * 3;
+      const floatRightY = Math.sin(t + 1.8) * 16;
+      const floatRightRot = Math.cos((t + 1.8) * 0.8) * 3;
+
       // =======================================================================
-      // 1. LEFT SNEAKER (CRIMSON RUNNER) SCROLL-DRIVEN 3D FLIGHT PATH
+      // 1. LEFT SNEAKER (CRIMSON RUNNER) - Sinks down to bottom on scroll
       // =======================================================================
       if (leftShoeRef.current) {
-        // As you scroll: glides from bottom-left diagonally up and rightwards
-        const lx = (p * 420 - p * p * 120) + mx * -18;
-        const ly = (-p * 340) + my * -14;
-        const lRotZ = 16 - p * 52 + mx * -8;
-        const lRotX = -8 + p * 20 + my * -10;
-        const lRotY = 14 - p * 28 + mx * -12;
-        const lScale = 1.0 + Math.sin(p * Math.PI) * 0.28;
+        const lx = (-p * 50) + mx * -24;
+        const ly = (p * 360) + floatLeftY + my * -14;
+        const lRotZ = 12 + floatLeftRot - (p * 24) + mx * -12 + (leftSpin.current * 0.3);
+        const lRotX = -8 + (my * -16) + (p * 20);
+        const lRotY = 16 + (mx * -22) + leftSpin.current;
+        const lScale = (1.0 - p * 0.12) + (hoveredShoe === 'left' ? 0.08 : 0);
+        const lOpacity = Math.max(0.15, 1.0 - p * 0.7);
 
         leftShoeRef.current.style.transform = 
           `translate3d(${lx}px, ${ly}px, 0) rotateX(${lRotX}deg) rotateY(${lRotY}deg) rotateZ(${lRotZ}deg) scale(${lScale})`;
+        leftShoeRef.current.style.opacity = `${lOpacity}`;
+
+        // Dynamic Floor Shadow
+        if (leftShadowRef.current) {
+          const shadowScale = (1.0 - (floatLeftY / 40)) * (1.0 - p * 0.4);
+          const shadowOpacity = Math.max(0.05, (0.25 - (floatLeftY / 120)) * (1.0 - p * 0.6));
+          leftShadowRef.current.style.transform = `translate3d(${lx * 0.7}px, ${p * 180}px, 0) scale(${shadowScale})`;
+          leftShadowRef.current.style.opacity = `${shadowOpacity}`;
+        }
       }
 
       // =======================================================================
-      // 2. RIGHT SNEAKER (VOLT V2 HIGH-TOP) SCROLL-DRIVEN 3D FLIGHT PATH
+      // 2. RIGHT SNEAKER (VOLT V2) - Sinks down to bottom on scroll
       // =======================================================================
       if (rightShoeRef.current) {
-        // As you scroll: glides from top-right diagonally down and leftwards across letters
-        const rx = (-p * 450 + p * p * 140) + mx * 22;
-        const ry = (p * 380) + my * 16;
-        const rRotZ = -14 + p * 54 + mx * 8;
-        const rRotX = 12 - p * 22 + my * 12;
-        const rRotY = -14 + p * 32 + mx * 16;
-        const rScale = 1.04 + Math.sin(p * Math.PI) * 0.32;
+        const rx = (p * 50) + mx * 26;
+        const ry = (p * 360) + floatRightY + my * 16;
+        const rRotZ = -14 + floatRightRot + (p * 24) + mx * 12 + (rightSpin.current * 0.3);
+        const rRotX = 10 + (my * 18) - (p * 20);
+        const rRotY = -18 + (mx * 24) + rightSpin.current;
+        const rScale = (1.0 - p * 0.12) + (hoveredShoe === 'right' ? 0.08 : 0);
+        const rOpacity = Math.max(0.15, 1.0 - p * 0.7);
 
         rightShoeRef.current.style.transform = 
           `translate3d(${rx}px, ${ry}px, 0) rotateX(${rRotX}deg) rotateY(${rRotY}deg) rotateZ(${rRotZ}deg) scale(${rScale})`;
+        rightShoeRef.current.style.opacity = `${rOpacity}`;
+
+        // Dynamic Floor Shadow
+        if (rightShadowRef.current) {
+          const shadowScale = (1.0 - (floatRightY / 40)) * (1.0 - p * 0.4);
+          const shadowOpacity = Math.max(0.05, (0.28 - (floatRightY / 120)) * (1.0 - p * 0.6));
+          rightShadowRef.current.style.transform = `translate3d(${rx * 0.7}px, ${p * 180}px, 0) scale(${shadowScale})`;
+          rightShadowRef.current.style.opacity = `${shadowOpacity}`;
+        }
       }
 
-      // =======================================================================
-      // 3. KINETIC TYPOGRAPHY PARTING ON SCROLL
-      // =======================================================================
-      if (line1Ref.current && line2Ref.current && line3Ref.current) {
-        const textUp = -p * 110 + my * 6;
-        const textDown = p * 90 + my * 6;
-        const textRight = p * 120 + mx * 8;
-
-        line1Ref.current.style.transform = `translate3d(${mx * 8}px, ${textUp}px, 0)`;
-        line2Ref.current.style.transform = `translate3d(${mx * 6}px, ${textDown * 0.7}px, 0)`;
-        line3Ref.current.style.transform = `translate3d(${textRight}px, ${textDown}px, 0)`;
+      // 3. Kinetic Text Parallax
+      if (line1Ref.current && line2Ref.current) {
+        const textDown = p * 60 + my * 3;
+        line1Ref.current.style.transform = `translate3d(${mx * 4}px, ${textDown * 0.4}px, 0)`;
+        line2Ref.current.style.transform = `translate3d(${mx * -4}px, ${textDown * 0.7}px, 0)`;
       }
 
-      // 4. Subtle grid translation
-      if (gridRef.current) {
-        gridRef.current.style.transform = `translate3d(${mx * 4}px, ${my * 4 - p * 30}px, 0)`;
-      }
-
-      // 5. Scroll indicator progress bar
+      // 4. Scroll indicator
       if (scrollIndicatorRef.current) {
-        scrollIndicatorRef.current.style.height = `${Math.min(100, Math.max(15, p * 100))}%`;
+        scrollIndicatorRef.current.style.height = `${Math.min(100, Math.max(25, (p / 1.0) * 100))}%`;
       }
 
       rafId = requestAnimationFrame(loop);
@@ -149,203 +197,220 @@ export function HeroCoverflow({ onQuickView, onAddToCart }: HeroProps) {
     return () => {
       clearTimeout(timer);
       window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
       window.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(rafId);
     };
-  }, []);
+  }, [hoveredShoe]);
+
+  const handleMouseDown = (target: 'left' | 'right', e: React.MouseEvent) => {
+    isDragging.current = true;
+    dragTarget.current = target;
+    startX.current = e.clientX;
+  };
 
   return (
-    // Pinned 220vh Scroll Stage Container
-    <div 
-      ref={outerContainerRef} 
-      className="relative w-full h-[220vh] bg-white selection:bg-[#ccff00] selection:text-black"
+    <section 
+      id="hero-coverflow" 
+      className="relative w-full min-h-[calc(100vh-5rem)] h-[calc(100vh-5rem)] max-h-[940px] flex flex-col justify-between overflow-hidden bg-white px-4 sm:px-8 lg:px-12 pt-4 pb-12 selection:bg-[#ccff00] selection:text-black scroll-mt-20 snap-start"
+      style={{ perspective: '1600px' }}
     >
-      {/* Sticky 100vh Full Screen Viewport */}
-      <section 
-        ref={stickyStageRef} 
-        id="hero-coverflow" 
-        className="sticky top-0 w-full h-screen min-h-[640px] max-h-[1080px] flex flex-col justify-between overflow-hidden bg-white py-4 sm:py-6 px-4 sm:px-8 lg:px-12"
-        style={{ perspective: '1600px' }}
-      >
-        
-        {/* 1. Subtle Architectural Grid */}
-        <div 
-          ref={gridRef}
-          className="absolute inset-0 opacity-[0.035] pointer-events-none transition-transform duration-700 ease-out z-0"
-          style={{
-            backgroundImage: `linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)`,
-            backgroundSize: '48px 48px'
-          }}
-        />
+      {/* Subtle Pristine Studio Architectural Grid */}
+      <div 
+        className="absolute inset-0 opacity-[0.025] pointer-events-none z-0"
+        style={{
+          backgroundImage: `linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)`,
+          backgroundSize: '56px 56px'
+        }}
+      />
 
-        {/* 2. Soft Ambient Spotlights */}
-        <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-[#ccff00]/14 blur-[140px] rounded-full pointer-events-none -z-10" />
-        <div className="absolute bottom-1/4 left-1/4 w-[450px] h-[450px] bg-lime-300/10 blur-[130px] rounded-full pointer-events-none -z-10" />
+      {/* Studio Center Spotlight Vignette (Pure Monochrome Soft Light) */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,1)_30%,rgba(244,244,245,0.6)_100%)] pointer-events-none -z-10" />
 
         {/* ======================================================================= */}
-        {/* SNEAKER 1: TOP-RIGHT VOLT SNEAKER (BEHIND TEXT z-10) */}
-        {/* GLIDES AND ROTATES ACROSS THE SCREEN CONTINUOUSLY ON SCROLL */}
+        {/* SNEAKER 1: RIGHT VOLT HIGH-TOP (3D GYROSCOPIC LEVITATION) */}
         {/* ======================================================================= */}
         <div 
           ref={rightShoeRef}
-          className={`absolute top-4 sm:top-8 md:top-10 right-0 sm:right-4 md:right-8 lg:right-16 z-10 pointer-events-auto will-change-transform transition-opacity duration-1000 ease-out ${
+          onMouseEnter={() => setHoveredShoe('right')}
+          onMouseLeave={() => setHoveredShoe(null)}
+          onMouseDown={(e) => handleMouseDown('right', e)}
+          className={`absolute top-4 sm:top-8 md:top-10 right-[-1%] sm:right-[1%] md:right-[3%] lg:right-[5%] xl:right-[7%] z-10 pointer-events-auto will-change-transform cursor-grab active:cursor-grabbing select-none transition-opacity duration-1000 ease-out ${
             isLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           style={{ transformStyle: 'preserve-3d' }}
         >
-          <div className="relative animate-float-slow group cursor-pointer" onClick={() => onQuickView(DENCLUB_SHOES[1])}>
+          <div className="relative group">
+            
+            {/* Sneaker Image - Faces inwards toward center text */}
             <img
               src={voltSneakerImg}
               alt="Volt V2 Carbon High-Top"
-              className="w-52 sm:w-72 md:w-96 lg:w-[480px] xl:w-[520px] object-contain drop-shadow-[0_28px_40px_rgba(0,0,0,0.18)] select-none transition-transform duration-500 group-hover:scale-105"
+              className="-scale-x-100 w-44 sm:w-56 md:w-68 lg:w-[360px] xl:w-[420px] object-contain drop-shadow-[0_24px_38px_rgba(0,0,0,0.22)] select-none pointer-events-none"
               draggable={false}
             />
 
-            {/* Floating Minimal Technical Badge */}
-            <div className="absolute top-1/4 left-2 z-10 opacity-90 group-hover:opacity-100 transition-opacity">
+            {/* Realistic Contact Floor Shadow */}
+            <div 
+              ref={rightShadowRef}
+              className="absolute -bottom-8 left-1/4 w-1/2 h-6 bg-black/25 blur-xl rounded-full -z-10 pointer-events-none transition-transform" 
+            />
+
+            {/* Interactive 3D Orbit Badge */}
+            <div 
+              onClick={() => onQuickView(DENCLUB_SHOES[1])}
+              className="absolute top-1/4 left-0 sm:left-2 z-10 transition-all duration-300 group-hover:scale-105 cursor-pointer"
+            >
               <div className="flex items-center gap-2">
-                <span className="size-2.5 rounded-full bg-[#ccff00] border-2 border-black animate-ping absolute" />
-                <span className="size-2.5 rounded-full bg-[#ccff00] border-2 border-black relative" />
-                <div className="px-3 py-1 rounded-full bg-black/95 text-[#ccff00] text-[10px] font-mono font-bold tracking-wider uppercase backdrop-blur-md shadow-lg flex items-center gap-1.5">
+                <span className="size-2 rounded-full bg-[#ccff00] border-2 border-black animate-ping absolute" />
+                <span className="size-2 rounded-full bg-[#ccff00] border-2 border-black relative" />
+                <div className="px-3 py-1 rounded-full bg-black/95 text-[#ccff00] text-[9px] sm:text-[10px] font-mono font-bold tracking-wider uppercase backdrop-blur-md shadow-xl border border-zinc-800 flex items-center gap-1.5 hover:border-[#ccff00] transition">
+                  <RotateCw className="size-2.5 animate-spin text-zinc-400" style={{ animationDuration: '6s' }} />
                   <span>VOLT V2</span>
                   <span className="text-white">·</span>
                   <span className="text-zinc-300">CARBON WAVE</span>
                 </div>
               </div>
             </div>
+
+            {/* Tech Mode Hotspots */}
+            {techMode && (
+              <div className="absolute -bottom-4 right-8 z-10 animate-in fade-in">
+                <div className="px-2.5 py-1 rounded-lg bg-black text-white text-[8px] font-mono tracking-widest uppercase border border-zinc-700 shadow-xl flex items-center gap-1.5">
+                  <Zap className="size-2.5 text-[#ccff00]" />
+                  <span>AIR-CELL DUAL CORE</span>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
 
         {/* ======================================================================= */}
-        {/* SNEAKER 2: BOTTOM-LEFT CRIMSON RUNNER (BEHIND TEXT z-10) */}
-        {/* GLIDES AND ROTATES ACROSS THE SCREEN CONTINUOUSLY ON SCROLL */}
+        {/* SNEAKER 2: LEFT CRIMSON RUNNER (3D GYROSCOPIC LEVITATION) */}
         {/* ======================================================================= */}
         <div 
           ref={leftShoeRef}
-          className={`absolute bottom-10 sm:bottom-14 md:bottom-16 left-0 sm:left-4 md:left-8 lg:left-14 z-10 pointer-events-auto will-change-transform transition-opacity duration-1000 ease-out ${
+          onMouseEnter={() => setHoveredShoe('left')}
+          onMouseLeave={() => setHoveredShoe(null)}
+          onMouseDown={(e) => handleMouseDown('left', e)}
+          className={`absolute bottom-16 sm:bottom-24 md:bottom-28 left-[-1%] sm:left-[1%] md:left-[3%] lg:left-[5%] xl:left-[7%] z-10 pointer-events-auto will-change-transform cursor-grab active:cursor-grabbing select-none transition-opacity duration-1000 ease-out ${
             isLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           style={{ transformStyle: 'preserve-3d' }}
         >
-          <div className="relative animate-float-reverse group cursor-pointer" onClick={() => onQuickView(DENCLUB_SHOES[0])}>
+          <div className="relative group">
+            
+            {/* Sneaker Image */}
             <img
               src={crimsonRunnerImg}
               alt="Apex X Streetwear Runner"
-              className="w-48 sm:w-64 md:w-84 lg:w-[440px] xl:w-[480px] object-contain drop-shadow-[0_28px_40px_rgba(0,0,0,0.16)] select-none transition-transform duration-500 group-hover:scale-105"
+              className="w-40 sm:w-52 md:w-64 lg:w-[340px] xl:w-[390px] object-contain drop-shadow-[0_24px_38px_rgba(0,0,0,0.2)] select-none pointer-events-none"
               draggable={false}
             />
 
-            {/* Floating Minimal Technical Badge */}
-            <div className="absolute bottom-1/4 right-2 z-10 opacity-90 group-hover:opacity-100 transition-opacity">
+            {/* Realistic Contact Floor Shadow */}
+            <div 
+              ref={leftShadowRef}
+              className="absolute -bottom-8 left-1/4 w-1/2 h-6 bg-black/22 blur-xl rounded-full -z-10 pointer-events-none transition-transform" 
+            />
+
+            {/* Interactive 3D Orbit Badge */}
+            <div 
+              onClick={() => onQuickView(DENCLUB_SHOES[0])}
+              className="absolute bottom-1/4 right-0 sm:right-2 z-10 transition-all duration-300 group-hover:scale-105 cursor-pointer"
+            >
               <div className="flex items-center gap-2">
-                <span className="size-2.5 rounded-full bg-[#84cc16] border-2 border-black animate-ping absolute" />
-                <span className="size-2.5 rounded-full bg-[#84cc16] border-2 border-black relative" />
-                <div className="px-3 py-1 rounded-full bg-black/95 text-white text-[10px] font-mono font-bold tracking-wider uppercase backdrop-blur-md shadow-lg flex items-center gap-1.5">
+                <span className="size-2 rounded-full bg-[#ef4444] border-2 border-black animate-ping absolute" />
+                <span className="size-2 rounded-full bg-[#ef4444] border-2 border-black relative" />
+                <div className="px-3 py-1 rounded-full bg-black/95 text-white text-[9px] sm:text-[10px] font-mono font-bold tracking-wider uppercase backdrop-blur-md shadow-xl border border-zinc-800 flex items-center gap-1.5 hover:border-red-500 transition">
+                  <RotateCw className="size-2.5 animate-spin text-zinc-400" style={{ animationDuration: '6s' }} />
                   <span>APEX X</span>
                   <span className="text-[#ccff00]">·</span>
                   <span className="text-zinc-300">NITRO-CELL</span>
                 </div>
               </div>
             </div>
+
+            {/* Tech Mode Hotspots */}
+            {techMode && (
+              <div className="absolute -top-4 left-8 z-10 animate-in fade-in">
+                <div className="px-2.5 py-1 rounded-lg bg-black text-white text-[8px] font-mono tracking-widest uppercase border border-zinc-700 shadow-xl flex items-center gap-1.5">
+                  <Layers className="size-2.5 text-red-400" />
+                  <span>FULL CARBON PROPULSION</span>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
 
         {/* ======================================================================= */}
-        {/* MAIN HERO CONTENT & TYPOGRAPHY (IN FRONT OF SHOES: z-20) */}
+        {/* TOP: MINIMAL CAMPAIGN PILL & 3D INTERACTIVE CONTROLS */}
         {/* ======================================================================= */}
-        <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col justify-between relative z-20 py-2 pointer-events-none">
+        <div className="w-full flex items-center justify-center gap-3 z-20 pointer-events-auto">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-black text-white text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest shadow-md">
+            <span className="size-2 rounded-full bg-[#ccff00] animate-ping" />
+            <span className="text-[#ccff00] font-mono">●</span>
+            <span>VOL. 12 — LIVE NOW</span>
+          </div>
+
+          <button
+            onClick={() => setTechMode(!techMode)}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all duration-200 shadow-xs cursor-pointer ${
+              techMode
+                ? 'bg-black text-[#ccff00] border border-black ring-2 ring-lime-400/50'
+                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200'
+            }`}
+            title="Toggle 3D Engineering Hotspots"
+          >
+            <Compass className={`size-3 ${techMode ? 'text-[#ccff00]' : 'text-zinc-500'}`} />
+            <span>{techMode ? '3D TECH ACTIVE' : 'DRAG TO SPIN 3D'}</span>
+          </button>
+        </div>
+
+        {/* ======================================================================= */}
+        {/* CENTER: MINIMAL ICONIC TYPOGRAPHY & HIGH-ENERGY CTA */}
+        {/* ======================================================================= */}
+        <div className="max-w-4xl mx-auto w-full text-center space-y-4 my-auto relative z-20 pointer-events-none select-none">
           
-          {/* Top Campaign Live Badge */}
-          <div className="text-center pt-2 pointer-events-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black text-white text-[11px] font-black uppercase tracking-widest shadow-lg">
-              <span className="size-2 rounded-full bg-[#ccff00] animate-ping" />
-              <span className="text-[#ccff00] font-mono">●</span>
-              <span>VOL. 12 — LIVE NOW</span>
-            </div>
+          {/* Line 1: SNEAKERS BUILT */}
+          <div ref={line1Ref} className="will-change-transform transition-transform duration-100">
+            <h1 
+              className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.25rem] font-black tracking-tighter uppercase leading-[0.88] text-black drop-shadow-sm" 
+              style={{ fontFamily: 'Syne, sans-serif' }}
+            >
+              SNEAKERS BUILT
+            </h1>
           </div>
 
-          {/* Center Editorial Typography (Layered in Front of Shoes) */}
-          <div className="text-center max-w-5xl mx-auto space-y-3 my-auto py-2 select-none">
-            
-            <div ref={line1Ref} className="will-change-transform transition-transform duration-100">
-              <h1 
-                className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-[0.85] text-black drop-shadow-sm" 
-                style={{ fontFamily: 'Syne, sans-serif' }}
-              >
-                SNEAKERS
-              </h1>
-            </div>
-
-            <div className="flex items-baseline justify-center gap-4">
-              <div ref={line2Ref} className="will-change-transform transition-transform duration-100">
-                <span 
-                  className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-[0.85] text-black drop-shadow-sm" 
-                  style={{ fontFamily: 'Syne, sans-serif' }}
-                >
-                  BUILT
-                </span>
-              </div>
-
-              <div ref={line3Ref} className="will-change-transform transition-transform duration-100">
-                <span 
-                  className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-[0.85] text-[#84cc16] drop-shadow-sm" 
-                  style={{ fontFamily: 'Syne, sans-serif' }}
-                >
-                  FOR THE STREET
-                </span>
-              </div>
-            </div>
-
-            <p className="text-sm sm:text-base md:text-lg text-zinc-600 max-w-xl mx-auto font-medium leading-relaxed bg-white/50 backdrop-blur-[2px] rounded-full py-1">
-              Denclub makes small-batch footwear for people who actually wear their shoes out. High-heat silhouettes & performance engineering.
-            </p>
-
-            {/* Action CTAs */}
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2 pointer-events-auto">
-              <a
-                href="#catalog"
-                className="px-8 py-4 rounded-full bg-[#ccff00] hover:bg-[#b8e600] active:scale-95 text-black font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-200 shadow-xl shadow-lime-300/40 hover:-translate-y-0.5 cursor-pointer flex items-center gap-2"
-              >
-                <span>SHOP THE DROP</span>
-                <ArrowRight className="size-4" />
-              </a>
-
-              <a
-                href="#size-finder"
-                className="px-8 py-4 rounded-full bg-white hover:bg-zinc-100 border-2 border-zinc-200 text-black font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-200 hover:border-black hover:-translate-y-0.5 cursor-pointer flex items-center gap-2 shadow-xs"
-              >
-                <Ruler className="size-4 text-zinc-700" />
-                <span>SIZE GUIDE</span>
-              </a>
-            </div>
-
+          {/* Line 2: FOR THE STREET */}
+          <div ref={line2Ref} className="will-change-transform transition-transform duration-100">
+            <h2 
+              className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.25rem] font-black tracking-tighter uppercase leading-[0.88] text-[#65a30d] drop-shadow-sm" 
+              style={{ fontFamily: 'Syne, sans-serif' }}
+            >
+              FOR THE STREET
+            </h2>
           </div>
 
-          {/* Bottom Interactive Scroll Indicator Bar */}
-          <div className="pt-2 flex items-center justify-between max-w-6xl mx-auto w-full pointer-events-auto border-t border-zinc-200/80">
-            <div className="flex items-center gap-4 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
-              <span className="flex items-center gap-1.5">
-                <Flame className="size-3.5 text-[#84cc16]" />
-                Scroll Down To Animate Shoes
-              </span>
-              <span>•</span>
-              <span>100% NFC Authenticated</span>
-            </div>
-
-            <div className="flex items-center gap-2 text-[10px] font-mono font-bold tracking-widest text-zinc-600 uppercase">
-              <span>SCROLL INTERACTION</span>
-              <div className="w-3.5 h-6 rounded-full border border-zinc-400 p-0.5 flex flex-col justify-start">
-                <div 
-                  ref={scrollIndicatorRef}
-                  className="w-full bg-[#84cc16] rounded-full transition-all duration-75 min-h-[4px]" 
-                  style={{ height: '20%' }}
-                />
-              </div>
-            </div>
+          {/* Single Focused CTA Button */}
+          <div className="pt-2 pointer-events-auto">
+            <a
+              href="#catalog"
+              className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full bg-[#ccff00] hover:bg-[#b8e600] active:scale-95 text-black font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-200 shadow-xl shadow-lime-300/40 hover:-translate-y-0.5 cursor-pointer"
+            >
+              <span>SHOP THE DROP</span>
+              <ArrowRight className="size-4" />
+            </a>
           </div>
 
         </div>
+
       </section>
-    </div>
   );
 }
+
+
+
+

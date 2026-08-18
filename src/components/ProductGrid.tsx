@@ -49,36 +49,38 @@ export function ProductGrid({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-xs font-bold uppercase tracking-wider text-black">
-              <Sparkles className="size-3.5 text-[#84cc16]" />
-              <span>Full Atelier Catalog</span>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+          <div className="space-y-3 max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-zinc-950 text-white text-xs font-mono font-bold uppercase tracking-widest shadow-xs">
+              <Sparkles className="size-3.5 text-[#ccff00] animate-spin" style={{ animationDuration: '6s' }} />
+              <span>ATELIER ARCHIVE RELEASE</span>
             </div>
             <h2 
-              className="text-4xl sm:text-5xl font-black tracking-tight text-black uppercase"
+              className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-black uppercase leading-[1.04]"
               style={{ fontFamily: 'Syne, sans-serif' }}
             >
               LATEST DROPS & SILHOUETTES
             </h2>
-            <p className="text-sm sm:text-base text-zinc-600 max-w-xl">
+            <p className="text-sm sm:text-base text-zinc-600 max-w-2xl leading-relaxed">
               Engineered with proprietary carbon matrices, supercritical foam cushioning, and handcrafted leather craftsmanship.
             </p>
           </div>
 
           {/* Sort selector */}
-          <div className="flex items-center gap-2 self-start md:self-end">
-            <ArrowUpDown className="size-4 text-zinc-400" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-zinc-50 border border-zinc-300 text-black text-xs font-semibold rounded-xl px-3 py-2 focus:outline-none focus:border-[#84cc16] cursor-pointer"
-            >
-              <option value="featured">Featured / Newest</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="rating">Highest Rated</option>
-            </select>
+          <div className="flex items-center gap-2 self-start md:self-end shrink-0 pb-1">
+            <div className="flex items-center gap-2 bg-zinc-100 border border-zinc-200 rounded-full px-4 py-2 shadow-xs hover:border-zinc-300 transition">
+              <ArrowUpDown className="size-3.5 text-zinc-500" />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="bg-transparent text-black text-xs font-bold uppercase tracking-wider focus:outline-none cursor-pointer"
+              >
+                <option value="featured">Featured / Newest</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="rating">Highest Rated</option>
+              </select>
+            </div>
           </div>
         </div>
 

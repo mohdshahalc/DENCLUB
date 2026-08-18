@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { HeroCoverflow } from './components/HeroCoverflow';
-import { SneakerVaultCarousel } from './components/SneakerVaultCarousel';
 import { CurvedSneakerRack } from './components/CurvedSneakerRack';
 import { ProductGrid } from './components/ProductGrid';
-import { TechLab } from './components/TechLab';
 import { Lookbook } from './components/Lookbook';
-import { InteractivePlayground } from './components/InteractivePlayground';
 import { SizeGuide } from './components/SizeGuide';
 import { ReviewsSection } from './components/ReviewsSection';
 import { CartDrawer } from './components/CartDrawer';
@@ -114,19 +111,13 @@ export default function App() {
           onAddToCart={(shoe) => handleAddToCart(shoe)}
         />
 
-        {/* 2. 3D Sneaker Vault Coverflow Section */}
-        <SneakerVaultCarousel
-          onQuickView={(shoe) => setQuickViewShoe(shoe)}
-          onAddToCart={(shoe) => handleAddToCart(shoe)}
-        />
-
-        {/* 3. True 3D Curved Spatial Sneaker Rack */}
+        {/* 2. True 3D Curved Spatial Sneaker Rack */}
         <CurvedSneakerRack
           onQuickView={(shoe) => setQuickViewShoe(shoe)}
           onAddToCart={(shoe) => handleAddToCart(shoe)}
         />
 
-        {/* 4. Interactive Catalog / Product Grid */}
+        {/* 3. Interactive Catalog / Product Grid (Latest Drops & Silhouettes) */}
         <ProductGrid
           shoes={DENCLUB_SHOES}
           wishlist={wishlist}
@@ -135,25 +126,16 @@ export default function App() {
           onAddToCart={(shoe, size) => handleAddToCart(shoe, size)}
         />
 
-        {/* 3. Sole Architecture & Tech Lab */}
-        <TechLab />
-
-        {/* 4. 360° Sneaker Customizer & Interactive Atelier */}
-        <InteractivePlayground
-          onAddToCart={(shoe) => handleAddToCart(shoe)}
-          onQuickView={(shoe) => setQuickViewShoe(shoe)}
-        />
-
-        {/* 5. Global Street Lookbook */}
+        {/* 4. Global Street Lookbook (3D Circular Streetwear Vault) */}
         <Lookbook
           shoes={DENCLUB_SHOES}
           onQuickView={(shoe) => setQuickViewShoe(shoe)}
         />
 
-        {/* 6. Fit & Size Finder */}
+        {/* 5. Fit & Size Finder */}
         <SizeGuide />
 
-        {/* 7. Community Reviews & VIP Alerts */}
+        {/* 6. Community Reviews & VIP Alerts (Powered by Diagonal Marquee) */}
         <ReviewsSection />
       </main>
 
